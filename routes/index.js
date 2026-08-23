@@ -26,16 +26,23 @@ router.get('/', async (req, res) => {
 
   if (termo) {
     try {
-      const palavras = termo.toLowerCase().split(/[,\s]+/).filter(Boolean);
+      const palavras = termo
+        .toLowerCase()
+        .split(/[,\s]+/)
+        .filter(Boolean);
       const principal = palavras[0];
 
-      const resposta = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(principal)}`);
-      const dados = await resposta.json();
-      const pratosEncontrados = dados.meals || [];
+      const [porIngrediente, porNome] = await Promise.all([
+        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(principal)}`).then(r => r.json()),
+        fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(principal)}`).then(r => r.json())
+      ]);
 
-      if (pratosEncontrados.length > 0) {
+      const todosPratos = [...(porIngrediente.meals || []), ...(porNome.meals || [])];
+      const idsUnicos = [...new Set(todosPratos.map(p => p.idMeal))];
+
+      if (idsUnicos.length > 0) {
         const receitasCompletas = await Promise.all(
-          pratosEncontrados.map(p => fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${p.idMeal}`).then(r => r.json()))
+          idsUnicos.map(id => fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`).then(r => r.json()))
         );
 
         const pratosFinais = receitasCompletas
@@ -55,7 +62,7 @@ router.get('/', async (req, res) => {
         }
       }
     } catch (erro) {
-      console.error('Erro de conexão com a API:', erro);
+      console.error("Erro na busca da API:", erro);
     }
   }
 

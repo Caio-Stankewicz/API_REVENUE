@@ -2,60 +2,78 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Teste API - Receitas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Receitas</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-  <h1>Buscar Receitas (Teste Simples)</h1>
-  
-  <form action="/" method="GET">
-    <input type="text" name="termo" value="<%= termo %>" placeholder="Digite ex: chicken" required>
-    <button type="submit">Buscar</button>
-  </form>
+  <header class="hero">
+    <h1>Buscador de Receitas</h1>
+    <p>Encontre a refeição perfeita combinando os ingredientes que você tem em casa.</p>
+    
+    <form action="/" method="GET" class="search-form">
+      <input 
+        type="text" 
+        name="termo" 
+        placeholder="Ex: chicken, garlic, salt..." 
+        value="<%= termo %>" 
+        required
+      >
+      <button type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Buscar
+      </button>
+    </form>
+  </header>
 
-  <hr>
+  <main class="container">
+    <% if (pratos.length > 0) { %>
+      <div class="grid">
+        <% pratos.forEach(prato => { %>
+          <article class="card">
+            <div class="card-image-wrapper">
+              <img src="<%= prato.imagem %>" alt="<%= prato.nome %>">
+            </div>
+            <div class="card-content">
+              <h3><%= prato.nome %></h3>
+              <h4>Ingredientes Necessários</h4>
+              <ul>
+                <% 
+                  const palavrasBuscadas = termo.toLowerCase().split(/[,\s]+/).filter(Boolean);
+                %>
+                <% prato.ingredientes.forEach(item => { %>
+                  <% 
+                    const isDestacado = palavrasBuscadas.some(p => item.toLowerCase().includes(p)); 
+                  %>
+                  <li class="<%= isDestacado ? 'highlight' : '' %>"><%= item %></li>
+                <% }) %>
+              </ul>
+            </div>
+          </article>
+        <% }) %>
+      </div>
 
-  <% if (pratos.length > 0) { %>
-    <div class="lista-receitas">
-      <% pratos.forEach(prato => { %>
-        <div class="cartao">
-          <!-- Imagem pequena apenas para referência -->
-          <img src="<%= prato.imagem %>" alt="<%= prato.nome %>" width="200">
-          
-          <h3><%= prato.nome %></h3>
-          
-          <ul>
-            <% 
-              const palavrasBuscadas = termo.toLowerCase().split(/[,\s]+/).filter(Boolean);
-            %>
-            <% prato.ingredientes.forEach(item => { %>
-              <% 
-                const isDestacado = palavrasBuscadas.some(p => item.toLowerCase().includes(p)); 
-              %>
-              <!-- Aplica a classe apenas se encontrar a palavra -->
-              <li class="<%= isDestacado ? 'destaque' : '' %>"><%= item %></li>
-            <% }) %>
-          </ul>
-        </div>
-      <% }) %>
-    </div>
-
-    <div class="paginacao">
-      <% if (paginaAtual > 1) { %>
-        <a href="/?termo=<%= termo %>&page=<%= paginaAtual - 1 %>">Anterior</a>
+      <% if (totalPaginas > 1) { %>
+        <nav class="pagination">
+          <% if (paginaAtual > 1) { %>
+            <a href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual - 1 %>">← Anterior</a>
+          <% } %>
+          <span>Página <%= paginaAtual %> de <%= totalPaginas %></span>
+          <% if (paginaAtual < totalPaginas) { %>
+            <a href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual + 1 %>">Próxima →</a>
+          <% } %>
+        </nav>
       <% } %>
-      
-      <span>Página <%= paginaAtual %> de <%= totalPaginas %></span>
-      
-      <% if (paginaAtual < totalPaginas) { %>
-        <a href="/?termo=<%= termo %>&page=<%= paginaAtual + 1 %>">Próxima</a>
-      <% } %>
-    </div>
 
-  <% } else if (termo !== '') { %>
-    <p>Nenhuma receita encontrada para "<%= termo %>".</p>
-  <% } %>
+    <% } else if (termo !== '') { %>
+      <div class="empty-state">
+        <span class="emoji">🍽️</span>
+        <h2>Nenhuma receita encontrada</h2>
+        <p>Não achamos nada com "<strong><%= termo %></strong>". Tente buscar por outros ingredientes em inglês!</p>
+      </div>
+    <% } %>
+  </main>
 
 </body>
 </html>
