@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Caio-Stankewicz/API_REVENUE#readme",
   "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.1",
     "ejs": "^6.0.1",
     "express": "^5.2.1"
   }
