@@ -1,0 +1,45 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #fff;
+  color: #333;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+.lista-receitas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cartao {
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 250px;
+  background-color: #f9f9f9;
+}
+
+.cartao img {
+  max-width: 100%;
+  height: auto;
+}
+
+.destaque {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+.paginacao {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 2px solid #ccc;
+}
+
+.paginacao a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: blue;
+}

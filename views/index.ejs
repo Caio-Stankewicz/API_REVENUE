@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste API - Receitas</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <h1>Buscar Receitas (Teste Simples)</h1>
+  
+  <form action="/" method="GET">
+    <input type="text" name="termo" value="<%= termo %>" placeholder="Digite ex: chicken" required>
+    <button type="submit">Buscar</button>
+  </form>
+
+  <hr>
+
+  <% if (pratos.length > 0) { %>
+    <div class="lista-receitas">
+      <% pratos.forEach(prato => { %>
+        <div class="cartao">
+          <!-- Imagem pequena apenas para referência -->
+          <img src="<%= prato.imagem %>" alt="<%= prato.nome %>" width="200">
+          
+          <h3><%= prato.nome %></h3>
+          
+          <ul>
+            <% 
+              const palavrasBuscadas = termo.toLowerCase().split(/[,\s]+/).filter(Boolean);
+            %>
+            <% prato.ingredientes.forEach(item => { %>
+              <% 
+                const isDestacado = palavrasBuscadas.some(p => item.toLowerCase().includes(p)); 
+              %>
+              <!-- Aplica a classe apenas se encontrar a palavra -->
+              <li class="<%= isDestacado ? 'destaque' : '' %>"><%= item %></li>
+            <% }) %>
+          </ul>
+        </div>
+      <% }) %>
+    </div>
+
+    <div class="paginacao">
+      <% if (paginaAtual > 1) { %>
+        <a href="/?termo=<%= termo %>&page=<%= paginaAtual - 1 %>">Anterior</a>
+      <% } %>
+      
+      <span>Página <%= paginaAtual %> de <%= totalPaginas %></span>
+      
+      <% if (paginaAtual < totalPaginas) { %>
+        <a href="/?termo=<%= termo %>&page=<%= paginaAtual + 1 %>">Próxima</a>
+      <% } %>
+    </div>
+
+  <% } else if (termo !== '') { %>
+    <p>Nenhuma receita encontrada para "<%= termo %>".</p>
+  <% } %>
+
+</body>
+</html>
