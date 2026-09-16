@@ -1,79 +1,198 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buscador de Receitas</title>
-  <link rel="stylesheet" href="/style.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>API TheMealDB</title>
+
+  <link
+    rel="stylesheet"
+    href="/style.css"
+  >
 </head>
+
 <body>
 
-  <header class="cabecalho-destaque">
-    <h1>Buscador de Receitas</h1>
-    <p>Encontre a refeição perfeita combinando os ingredientes que você tem em casa.</p>
-    
-    <form action="/" method="GET" class="formulario-busca">
-      <input 
-        type="text" 
-        name="termo" 
-        placeholder="Ex: chicken, garlic, salt..." 
-        value="<%= termo %>" 
-        required
-      >
-      <button type="submit">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        Buscar
-      </button>
-    </form>
-  </header>
+  <header class="cabecalho">
 
-  <main class="conteiner">
-    <% if (pratos.length > 0) { %>
-      <div class="grade-receitas">
-        <% pratos.forEach(prato => { %>
-          <article class="cartao-receita">
-            <div class="envoltura-imagem-cartao">
-              <img src="<%= prato.imagem %>" alt="<%= prato.nome %>">
-            </div>
-            <div class="conteudo-cartao">
-              <h3><%= prato.nome %></h3>
-              <h4>Ingredientes Necessários</h4>
+  <h1>
+    Buscador de Receitas
+  </h1>
+
+  <p>
+    Digite os ingredientes em inglês, separados por vírgula.
+  </p>
+
+  <form
+    action="/"
+    method="GET"
+    class="formulario-busca"
+  >
+
+    <input
+      type="text"
+      name="termo"
+      placeholder="Ex: egg, sugar, salt"
+      value="<%= termo %>"
+      required
+    >
+
+    <button type="submit">
+      Buscar
+    </button>
+
+  </form>
+
+</header>
+
+
+  <main class="conteudo">
+
+    <%
+      const ingredientesPesquisados = termo
+        .split(',')
+        .map(item => item.trim().toLowerCase())
+        .filter(Boolean);
+    %>
+
+
+    <% if (receitas.length > 0) { %>
+
+      <section class="grade-receitas">
+
+
+        <% receitas.forEach(receita => { %>
+
+          <article class="cartao">
+
+
+            <img
+              src="<%= receita.imagem %>"
+              alt="<%= receita.nome %>"
+            >
+
+
+            <div class="cartao-conteudo">
+
+              <h2>
+                <%= receita.nome %>
+              </h2>
+
+
+              <h3>
+                Ingredientes
+              </h3>
+
+
               <ul>
-                <% 
-                  const palavrasBuscadas = termo.toLowerCase().split(/[,\s]+/).filter(Boolean);
-                %>
-                <% prato.ingredientes.forEach(item => { %>
-                  <% 
-                    const isDestacado = palavrasBuscadas.some(p => item.toLowerCase().includes(p)); 
+
+                <% receita.ingredientes.forEach(ingrediente => { %>
+
+                  <%
+                    const selecionado =
+                      ingredientesPesquisados.some(item =>
+                        ingrediente.nome
+                          .toLowerCase()
+                          .includes(item)
+                      );
                   %>
-                  <li class="<%= isDestacado ? 'destaque' : '' %>"><%= item %></li>
+
+
+                  <li
+                    class="<%= selecionado ? 'ingrediente-selecionado' : '' %>"
+                  >
+
+                    <strong>
+                      <%= ingrediente.nome %>
+                    </strong>
+
+                    <span>
+                      <%= ingrediente.medida %>
+                    </span>
+
+                  </li>
+
                 <% }) %>
+
               </ul>
+
+
+              <details class="modo-preparo">
+
+                <summary>
+                  Ver Modo de Preparo
+                </summary>
+
+                <div class="preparo">
+
+                  <p>
+                    <%= receita.preparo %>
+                  </p>
+
+                </div>
+
+              </details>
+
             </div>
+
           </article>
+
         <% }) %>
-      </div>
+
+      </section>
+
 
       <% if (totalPaginas > 1) { %>
+
         <nav class="paginacao">
+
           <% if (paginaAtual > 1) { %>
-            <a href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual - 1 %>">← Anterior</a>
+
+            <a
+              href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual - 1 %>"
+            >
+              ← Previous
+            </a>
+
           <% } %>
-          <span>Página <%= paginaAtual %> de <%= totalPaginas %></span>
+
+
+          <span>
+            Page <%= paginaAtual %> of <%= totalPaginas %>
+          </span>
+
+
           <% if (paginaAtual < totalPaginas) { %>
-            <a href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual + 1 %>">Próxima →</a>
+
+            <a
+              href="/?termo=<%= encodeURIComponent(termo) %>&page=<%= paginaAtual + 1 %>"
+            >
+              Next →
+            </a>
+
           <% } %>
+
         </nav>
+
       <% } %>
 
-    <% } else if (termo !== '') { %>
-      <div class="estado-vazio">
-        <span class="icone-vazio">🍽️</span>
-        <h2>Nenhuma receita encontrada</h2>
-        <p>Não achamos nada com "<strong><%= termo %></strong>". Tente buscar por outros ingredientes em inglês!</p>
-      </div>
+
+    <% } else if (termo) { %>
+
+      <p class="mensagem">
+        Nenhuma receita encontrada.
+      </p>
+
     <% } %>
+
   </main>
 
 </body>
+
 </html>
