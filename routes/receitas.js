@@ -102,7 +102,7 @@ router.get('/', async (req, res) => {
     console.error(erro);
 
     return res.status(500).send(
-      'Error while searching recipes'
+      'Erro ao buscar receitas. Por favor, tente novamente mais tarde.'
     );
   }
 });
